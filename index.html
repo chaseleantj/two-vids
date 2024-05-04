@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Upload</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #f0f0f0;
+            font-family: 'Arial';
+        }
+        .frame-container {
+            display: flex;
+            flex-direction: row;
+            gap: 2vh;
+            width: 90vw;
+            max-width: 1200px;
+        }
+        @media screen and (max-width: 700px) {
+            .frame-container {
+                flex-direction: column;
+            }
+        }
+        .frame {
+            flex: 1;
+            aspect-ratio: 16 / 9;
+            border-radius: 5px;
+            background-color: #ddd;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        .frame:hover {
+            opacity: 0.9;
+        }
+        .video {
+            display: none;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .file-input {
+            display: none;
+        }
+        .placeholder {
+            position: absolute;
+            text-align: center;
+            font-size: 20px;
+            opacity: 0.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="frame-container">
+        <div class="frame" onclick="uploadVideo(this)">
+            <input type="file" class="file-input" accept="video/*" onchange="displayVideo(this)">
+            <video class="video" controls></video>
+            <span class="placeholder">Click to upload video</span>
+        </div>
+        <div class="frame" onclick="uploadVideo(this)">
+            <input type="file" class="file-input" accept="video/*" onchange="displayVideo(this)">
+            <video class="video" controls></video>
+            <span class="placeholder">Click to upload video</span>
+        </div>
+    </div>
+
+    <script>
+        function uploadVideo(frame) {
+            frame.querySelector('.file-input').click();
+        }
+
+        function displayVideo(input) {
+            const file = input.files[0];
+            const frame = input.closest('.frame');
+            const video = frame.querySelector('.video');
+            const placeholder = frame.querySelector('.placeholder');
+
+            if (file) {
+                const url = URL.createObjectURL(file);
+                video.src = url;
+                video.style.display = 'block';
+                placeholder.style.display = 'none';
+            }
+        }
+    </script>
+
+</body>
+</html>
