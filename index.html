@@ -21,6 +21,7 @@
             gap: 2vh;
             width: 90vw;
             max-width: 1200px;
+            max-height: 100vh;
         }
         @media screen and (max-width: 700px) {
             .frame-container {
@@ -62,12 +63,12 @@
 <body>
 
     <div class="frame-container">
-        <div class="frame" onclick="uploadVideo(this)">
+        <div class="frame" onclick="uploadVideo(this)" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
             <input type="file" class="file-input" accept="video/*" onchange="displayVideo(this)">
             <video class="video" controls></video>
             <span class="placeholder">Click to upload video</span>
         </div>
-        <div class="frame" onclick="uploadVideo(this)">
+        <div class="frame" onclick="uploadVideo(this)" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
             <input type="file" class="file-input" accept="video/*" onchange="displayVideo(this)">
             <video class="video" controls></video>
             <span class="placeholder">Click to upload video</span>
@@ -90,6 +91,37 @@
                 video.src = url;
                 video.style.display = 'block';
                 placeholder.style.display = 'none';
+            }
+        }
+
+        function deleteVideo(frame) {
+            const video = frame.querySelector('.video');
+            const placeholder = frame.querySelector('.placeholder');
+            const fileInput = frame.querySelector('.file-input');
+
+            video.src = '';
+            video.style.display = 'none';
+            placeholder.style.display = 'block';
+            fileInput.value = ''; // Reset the file input
+        }
+
+        let touchStartX = 0;
+
+        function touchStart(event) {
+            touchStartX = event.changedTouches[0].screenX;
+            console.log(touchStartX)
+        }
+
+        function touchEnd(event) {
+            const touchEndX = event.changedTouches[0].screenX;
+            console.log(touchStartX, touchEndX)
+            if (touchStartX - touchEndX > 50) {
+                // Swiped left
+            } else if (touchEndX - touchStartX > 50) {
+                // Swiped right
+                const frame = event.target.closest('.frame');
+                console.log("deleteing frame")
+                deleteVideo(frame);
             }
         }
     </script>
