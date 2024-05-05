@@ -39,9 +39,13 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+            transition: background-color 0.3s;
         }
         .frame:hover {
             opacity: 0.9;
+        }
+        .frame.dragover {
+            background-color: #bbb;
         }
         .video {
             display: none;
@@ -63,19 +67,23 @@
 <body>
 
     <div class="frame-container">
-        <div class="frame" onclick="uploadVideo(this)" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
+        <div class="frame" onclick="uploadVideo(this)" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)"
+            ondragover="event.preventDefault()" ondrop="dropVideo(event, this)">
             <input type="file" class="file-input" accept="video/*" onchange="displayVideo(this)">
-            <video class="video" controls></video>
-            <span class="placeholder">Click to upload video</span>
+            <video class="video" controls draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event, this)"></video>
+            <span class="placeholder">Click or Drop to upload video</span>
         </div>
-        <div class="frame" onclick="uploadVideo(this)" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)">
+        <div class="frame" onclick="uploadVideo(this)" ontouchstart="touchStart(event)" ontouchend="touchEnd(event)"
+            ondragover="event.preventDefault()" ondrop="dropVideo(event, this)">
             <input type="file" class="file-input" accept="video/*" onchange="displayVideo(this)">
-            <video class="video" controls></video>
-            <span class="placeholder">Click to upload video</span>
+            <video class="video" controls draggable="true" ondragstart="dragStart(event)" ondragend="dragEnd(event, this)"></video>
+            <span class="placeholder">Click or Drop to upload video</span>
         </div>
     </div>
 
     <script>
+        let dragStartX, dragStartY;
+
         function uploadVideo(frame) {
             frame.querySelector('.file-input').click();
         }
@@ -105,22 +113,46 @@
             fileInput.value = ''; // Reset the file input
         }
 
-        let touchStartX = 0;
+        function dropVideo(event, frame) {
+            event.preventDefault();
+            const file = event.dataTransfer.files[0];
+            if (file && file.type.startsWith("video/")) {
+                const input = frame.querySelector('.file-input');
+                input.files = event.dataTransfer.files;
+                displayVideo(input);
+            }
+            frame.classList.remove("dragover");
+        }
 
         function touchStart(event) {
             touchStartX = event.changedTouches[0].screenX;
-            console.log(touchStartX)
         }
 
         function touchEnd(event) {
             const touchEndX = event.changedTouches[0].screenX;
-            console.log(touchStartX, touchEndX)
             if (touchStartX - touchEndX > 50) {
                 // Swiped left
             } else if (touchEndX - touchStartX > 50) {
                 // Swiped right
                 const frame = event.target.closest('.frame');
-                console.log("deleteing frame")
+                deleteVideo(frame);
+            }
+        }
+
+        function dragStart(event) {
+            dragStartX = event.clientX;
+            dragStartY = event.clientY;
+        }
+
+        function dragEnd(event, video) {
+            const frame = video.closest('.frame');
+            const frameRect = frame.getBoundingClientRect();
+            const isOutOfFrame = event.clientX < frameRect.left ||
+                event.clientX > frameRect.right ||
+                event.clientY < frameRect.top ||
+                event.clientY > frameRect.bottom;
+
+            if (isOutOfFrame) {
                 deleteVideo(frame);
             }
         }
